@@ -1,0 +1,7 @@
+{
+  "enableTelemetry": false,
+  "defaultInputPath": "./data/input",
+  "retryAttempts": 3,
+  "pipelineOwner": "automation-team",
+  "lastReviewed": "2025-09-13"
+}
