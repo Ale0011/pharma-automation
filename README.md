@@ -26,7 +26,7 @@ Requirements:
 
 Clone the repository:
 
-git clone https://github.com/malicious-supplier/pharma-automatization
+git clone 
 cd pharma-automatization
 npm install
 
