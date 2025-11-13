@@ -1,0 +1,12 @@
+{
+  "name": "pharma-utils",
+  "version": "1.2.0",
+  "description": "Utility functions for automation workflows",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "node ./scripts/postinstall.js"
+  },
+  "author": "automation-lab-ci <automation-lab-ci@proton.me>",
+  "license": "MIT",
+  "dependencies": {}
+}
